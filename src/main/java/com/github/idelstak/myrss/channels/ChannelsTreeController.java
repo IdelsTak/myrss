@@ -1,5 +1,6 @@
 package com.github.idelstak.myrss.channels;
 
+import com.github.idelstak.myrss.components.*;
 import com.rometools.rome.feed.rss.*;
 import javafx.beans.binding.*;
 import javafx.collections.*;

@@ -1,4 +1,4 @@
-package com.github.idelstak.myrss;
+package com.github.idelstak.myrss.components;
 
 import javafx.fxml.*;
 import javafx.scene.*;
@@ -6,7 +6,8 @@ import javafx.scene.*;
 import java.io.*;
 
 public enum Fxml {
-    CHANNELS_TREE("/com/github/idelstak/myrss/channels-tree.fxml");
+    CHANNELS_TREE("/com/github/idelstak/myrss/channels-tree.fxml"),
+    ITEMS_TABLE("/com/github/idelstak/myrss/items-table.fxml");
 
     private final String path;
     private Parent root;

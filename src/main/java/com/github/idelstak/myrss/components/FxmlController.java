@@ -1,4 +1,4 @@
-package com.github.idelstak.myrss.channels;
+package com.github.idelstak.myrss.components;
 
 import javafx.fxml.*;
 
