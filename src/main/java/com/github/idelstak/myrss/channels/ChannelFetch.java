@@ -1,4 +1,4 @@
-package com.github.idelstak.myrss;
+package com.github.idelstak.myrss.channels;
 
 import com.rometools.fetcher.*;
 import com.rometools.fetcher.impl.*;
@@ -15,7 +15,7 @@ public class ChannelFetch {
 
     public ChannelFetch(URL url) {this.url = url;}
 
-    Channel channel() throws FetcherException, FeedException, IOException {
+    public Channel channel() throws FetcherException, FeedException, IOException {
         FeedFetcherCache cache = HashMapFeedInfoCache.getInstance();
         SyndFeed feed = new HttpURLFeedFetcher(cache).retrieveFeed(url);
         return (Channel) feed.createWireFeed();
