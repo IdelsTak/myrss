@@ -153,4 +153,42 @@ public class MainViewTest {
 
         assertThat(node).isNotNull();
     }
+
+    @Test
+    public void addsSubscriptionFromLink(FxRobot robot) throws Exception {
+        robot.clickOn("#addSubscriptionButton", MouseButton.PRIMARY);
+        waitForFxEvents();
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString("https://feeds.megaphone.fm/newheights");
+        runFX(() -> Clipboard.getSystemClipboard().setContent(content));
+        robot.rightClickOn("#urlField").clickOn("Paste", MouseButton.PRIMARY);
+        waitForFxEvents();
+
+        robot.clickOn("#fetchButton");
+        waitForFxEvents();
+
+        ProgressIndicator indicator = robot.lookup("#progressIndicator").queryAs(ProgressIndicator.class);
+        waitForFxEvents();
+
+        org.testfx.assertions.api.Assertions.assertThat(indicator).isVisible();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        indicator.visibleProperty().addListener((_, _, visible) -> {
+            if (visible == null) {
+                return;
+            }
+            latch.countDown();
+        });
+
+        latch.await();
+
+        robot.clickOn("OK");
+        waitForFxEvents();
+
+        Node node = robot.lookup("New Heights with Jason and Travis Kelce").query();
+        waitForFxEvents();
+
+        assertThat(node).isNotNull();
+    }
 }
