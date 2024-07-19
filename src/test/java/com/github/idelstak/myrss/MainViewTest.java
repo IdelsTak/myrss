@@ -4,10 +4,12 @@ import com.github.idelstak.myrss.launch.*;
 import com.rometools.rome.feed.rss.*;
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.*;
+import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.scene.Node;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.stage.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
@@ -33,6 +35,7 @@ import static org.testfx.util.WaitForAsyncUtils.*;
 public class MainViewTest {
 
     private final ObservableList<Channel> channels = observableArrayList();
+    private final ObjectProperty<File> selectedRssFile = new SimpleObjectProperty<>();
 
     @Start
     public void setup(Stage stage) {
@@ -42,6 +45,7 @@ public class MainViewTest {
                 root = MAIN_VIEW.root();
                 MainViewController controller = (MainViewController) MAIN_VIEW.controller();
                 controller.setChannels(channels);
+                controller.setSelectedRssFile(selectedRssFile);
             } catch (IOException e) {
                 fail(e);
             }
@@ -54,7 +58,10 @@ public class MainViewTest {
 
     @BeforeEach
     public void initialize() {
-        runFX(channels::clear);
+        runFX(() -> {
+            channels.clear();
+            selectedRssFile.set(null);
+        });
     }
 
     @Test
@@ -121,5 +128,29 @@ public class MainViewTest {
                                        .extracting(TableView::getSelectionModel)
                                        .extracting(SelectionModel::getSelectedItem)
                                        .isNotNull();
+    }
+
+    @Test
+    public void addsSubscriptionFromFile(FxRobot robot) throws Exception {
+        SplitMenuButton button = robot.lookup("#addSubscriptionButton").queryAs(SplitMenuButton.class);
+        Node lookup = button.lookup(".arrow-button");
+        robot.clickOn(lookup, MouseButton.PRIMARY).clickOn("#addSubscriptionMenuItem", MouseButton.PRIMARY);
+
+        waitForFxEvents();
+
+        robot.press(KeyCode.ESCAPE);
+
+        waitForFxEvents();
+
+        URL resource = getClass().getResource("/sample/files/swing.rss");
+        assert resource != null;
+        selectedRssFile.set(new File(resource.toURI()));
+
+        waitForFxEvents();
+
+        Node node = robot.lookup("All Swing jobs | upwork.com").query();
+        waitForFxEvents();
+
+        assertThat(node).isNotNull();
     }
 }

@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/22"
-            fx:controller="com.github.idelstak.myrss.launch.MainViewController">
+<?import org.kordamp.ikonli.javafx.*?>
+
+<BorderPane prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.idelstak.myrss.launch.MainViewController">
     <top>
         <ToolBar BorderPane.alignment="CENTER">
-            <Button mnemonicParsing="false" text="Button"/>
+         <SplitMenuButton fx:id="addSubscriptionButton" mnemonicParsing="false" onAction="#addSubscriptionFromLink" text="Add Subscription">
+           <items>
+             <MenuItem fx:id="addSubscriptionMenuItem" mnemonicParsing="false" onAction="#addSubscriptionFromFile" text="Add from File" />
+           </items>
+            <graphic>
+               <FontIcon style="-fx-icon-code: bx-plus; -fx-icon-size: 24px;" />
+            </graphic>
+         </SplitMenuButton>
         </ToolBar>
     </top>
     <bottom>
-        <HBox fx:id="statusBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0"
-              style="-fx-border-color: lightgray transparent transparent transparent;" BorderPane.alignment="CENTER"/>
+        <HBox fx:id="statusBox" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" style="-fx-border-color: lightgray transparent transparent transparent;" BorderPane.alignment="CENTER" />
     </bottom>
     <center>
         <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
-            <AnchorPane fx:id="channelsPane" minWidth="-Infinity" prefWidth="100.0"/>
+            <AnchorPane fx:id="channelsPane" minWidth="-Infinity" prefWidth="100.0" />
             <SplitPane dividerPositions="0.3" minWidth="-Infinity" orientation="VERTICAL" prefWidth="200.0">
-                <AnchorPane fx:id="itemsPane" minHeight="-Infinity" prefHeight="100.0"/>
-                <AnchorPane fx:id="itemContentPane" minHeight="-Infinity" prefHeight="150.0"/>
+                <AnchorPane fx:id="itemsPane" minHeight="-Infinity" prefHeight="100.0" />
+                <AnchorPane fx:id="itemContentPane" minHeight="-Infinity" prefHeight="150.0" />
             </SplitPane>
         </SplitPane>
     </center>
