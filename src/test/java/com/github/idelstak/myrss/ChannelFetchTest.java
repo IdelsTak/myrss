@@ -1,6 +1,7 @@
 package com.github.idelstak.myrss;
 
 import com.github.idelstak.myrss.channels.*;
+import com.github.idelstak.myrss.components.*;
 import com.rometools.rome.feed.rss.*;
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.*;

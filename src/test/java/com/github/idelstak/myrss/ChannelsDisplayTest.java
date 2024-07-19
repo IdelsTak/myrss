@@ -12,16 +12,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.testfx.api.*;
 import org.testfx.framework.junit5.*;
-import org.testfx.util.*;
 
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.stream.*;
 
-import static com.github.idelstak.myrss.Fxml.*;
+import static com.github.idelstak.myrss.components.Fxml.*;
 import static javafx.application.Platform.*;
 import static javafx.collections.FXCollections.*;
 import static org.junit.jupiter.api.Assertions.fail;

@@ -1,4 +1,4 @@
-package com.github.idelstak.myrss;
+package com.github.idelstak.myrss.components;
 
 import org.apache.commons.text.*;
 
@@ -11,7 +11,7 @@ public class CleanLink {
 
     public CleanLink(String text) {this.text = text;}
 
-    URL url() throws URISyntaxException, MalformedURLException {
+    public URL url() throws URISyntaxException, MalformedURLException {
         String decoded = URLDecoder.decode(text, StandardCharsets.UTF_8);
         String unescaped = StringEscapeUtils.unescapeHtml4(decoded);
         return new URI(unescaped).toURL();

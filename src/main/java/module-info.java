@@ -9,9 +9,12 @@ module com.github.idelstak.myrss {
     requires com.rometools.rome;
     requires rome.fetcher;
     requires org.apache.commons.lang3;
+    requires java.desktop;
 
-    exports com.github.idelstak.myrss;
     exports com.github.idelstak.myrss.channels;
-    opens com.github.idelstak.myrss;
     opens com.github.idelstak.myrss.channels;
+    exports com.github.idelstak.myrss.components;
+    opens com.github.idelstak.myrss.components;
+    exports com.github.idelstak.myrss.items;
+    opens com.github.idelstak.myrss.items;
 }
