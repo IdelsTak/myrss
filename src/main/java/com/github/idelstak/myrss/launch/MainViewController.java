@@ -17,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 
 import java.io.*;
+import java.util.*;
 
 import static com.github.idelstak.myrss.components.Fxml.*;
 import static javafx.application.Platform.*;
@@ -92,7 +93,11 @@ public class MainViewController extends FxmlController {
     }
 
     @FXML
-    private void addSubscriptionFromLink(ActionEvent event) {
+    private void addSubscriptionFromLink(ActionEvent event) throws IOException {
+        Window owner = ((Node) event.getSource()).getScene().getWindow();
+        Optional<Channel> channel = new NewChannelDialog(owner).showAndWait();
+
+        channel.ifPresent(fetched -> runLater(() -> channels.add(fetched)));
     }
 
     @FXML
