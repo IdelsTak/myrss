@@ -7,36 +7,38 @@ import com.rometools.rome.io.*;
 import javafx.beans.property.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.web.*;
 import javafx.stage.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.testfx.api.*;
 import org.testfx.framework.junit5.*;
+import org.testfx.framework.junit5.utils.*;
+import org.w3c.dom.*;
 
 import java.io.*;
 import java.net.*;
 
 import static com.github.idelstak.myrss.components.Fxml.*;
 import static javafx.application.Platform.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.testfx.assertions.api.Assertions.*;
+import static org.testfx.assertions.api.Assertions.assertThat;
 import static org.testfx.util.WaitForAsyncUtils.*;
 
 @ExtendWith(ApplicationExtension.class)
-public class ItemsDisplayTest {
+public class ItemContentDisplayTest {
 
-    private final ObjectProperty<Channel> channel;
-
-    public ItemsDisplayTest() {channel = new SimpleObjectProperty<>();}
+    private final ObjectProperty<Item> item = new SimpleObjectProperty<>();
 
     @Start
     public void setup(Stage stage) {
         runLater(() -> {
             Parent root = null;
             try {
-                root = ITEMS_TABLE.root();
-                ItemsTableController controller = (ItemsTableController) ITEMS_TABLE.controller();
-                controller.setChannel(channel);
+                root = ITEMS_CONTENT.root();
+                ItemContentController controller = (ItemContentController) ITEMS_CONTENT.controller();
+                controller.setItem(item);
             } catch (IOException e) {
                 fail(e);
             }
@@ -57,8 +59,8 @@ public class ItemsDisplayTest {
                 File file = new File(resource.toURI());
                 SyndFeed feed = new SyndFeedInput().build(file);
                 Channel channel = (Channel) feed.createWireFeed();
-                this.channel.set(null);
-                this.channel.set(channel);
+                item.set(null);
+                item.set(channel.getItems().getFirst());
             } catch (URISyntaxException | FeedException | IOException e) {
                 fail(e);
             }
@@ -67,9 +69,19 @@ public class ItemsDisplayTest {
     }
 
     @Test
-    public void displaysItems(FxRobot robot) {
-        TableView<Object> view = robot.lookup("#itemsTable").queryTableView();
+    public void displaysTitle(FxRobot robot) {
+        Labeled labeled = robot.lookup("#titleLabel").queryLabeled();
         waitForFxEvents();
-        assertThat(view).hasExactlyNumRows(7);
+        assertThat(labeled).hasText(item.get().getTitle());
+    }
+
+    @Test
+    public void displaysContent(FxRobot robot) throws Exception {
+        WebView view = robot.lookup("#contentView").queryAs(WebView.class);
+        waitForFxEvents();
+        FXUtils.runFX(() -> {
+            Document document = view.getEngine().getDocument();
+            assertThat(document).isNotNull();
+        });
     }
 }

@@ -55,7 +55,7 @@ public class ChannelsDisplayTest {
         runFX(channels::clear);
     }
 
-    @TestFx
+    @Test
     public void displaysStandardCategories(FxRobot robot) {
         TreeView<Object> view = robot.lookup("#channelsTree").queryAs(TreeView.class);
         TreeItem<Object> root = view.getRoot();
@@ -65,7 +65,7 @@ public class ChannelsDisplayTest {
                         .contains("Important", "Unread", "Uncategorized");
     }
 
-    @TestFx
+    @Test
     public void displaysChannels(FxRobot robot) throws Exception {
         URL filesDir = getClass().getResource("/sample/files");
         assert filesDir != null;

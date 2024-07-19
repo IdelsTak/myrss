@@ -37,6 +37,9 @@ public class ItemsTableController extends FxmlController {
     }
 
     public void setChannel(ObjectProperty<Channel> channel) {
+        if (this.channel.isBound()) {
+            this.channel.unbind();
+        }
         this.channel.bind(channel);
     }
 

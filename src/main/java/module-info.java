@@ -10,6 +10,7 @@ module com.github.idelstak.myrss {
     requires rome.fetcher;
     requires org.apache.commons.lang3;
     requires java.desktop;
+    requires javafx.web;
 
     exports com.github.idelstak.myrss.channels;
     opens com.github.idelstak.myrss.channels;
