@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.*?>
-
-
-<VBox prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.idelstak.myrss.items.ItemContentController">
-   <children>
-      <HBox style="-fx-border-color: transparent transparent lightgray transparent;">
-         <children>
-            <Label fx:id="titleLabel" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="{title}" HBox.hgrow="ALWAYS" />
-         </children>
-         <padding>
-            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-         </padding>
-      </HBox>
-      <WebView fx:id="contentView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-font-scale: 0.9;" VBox.vgrow="ALWAYS" />
-   </children>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/22"
+      fx:controller="com.github.idelstak.myrss.items.ItemContentController">
+    <HBox style="-fx-border-color: transparent transparent lightgray transparent;">
+        <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+        </padding>
+        <Label fx:id="titleLabel" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="{title}"
+               HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <WebView fx:id="contentView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0"
+             style="-fx-font-scale: 0.85;" VBox.vgrow="ALWAYS"/>
 </VBox>

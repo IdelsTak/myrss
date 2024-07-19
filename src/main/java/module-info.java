@@ -18,4 +18,6 @@ module com.github.idelstak.myrss {
     opens com.github.idelstak.myrss.components;
     exports com.github.idelstak.myrss.items;
     opens com.github.idelstak.myrss.items;
+    exports com.github.idelstak.myrss.launch;
+    opens com.github.idelstak.myrss.launch;
 }

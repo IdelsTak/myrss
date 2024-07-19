@@ -5,5 +5,5 @@ import javafx.fxml.*;
 public abstract class FxmlController {
 
     @FXML
-    protected abstract void initialize();
+    protected abstract void initialize() throws Exception;
 }
