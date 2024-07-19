@@ -22,6 +22,7 @@ public class ItemsTableController extends FxmlController {
 
     private final ObjectProperty<Channel> channel;
     private final ObservableList<Item> items;
+    private final ObjectProperty<Item> selectedItem;
     @FXML
     private TableView<Item> itemsTable;
     @FXML
@@ -34,6 +35,7 @@ public class ItemsTableController extends FxmlController {
     public ItemsTableController() {
         channel = new SimpleObjectProperty<>();
         items = FXCollections.observableArrayList();
+        selectedItem = new SimpleObjectProperty<>();
     }
 
     public void setChannel(ObjectProperty<Channel> channel) {
@@ -41,6 +43,10 @@ public class ItemsTableController extends FxmlController {
             this.channel.unbind();
         }
         this.channel.bind(channel);
+    }
+
+    public ObjectProperty<Item> selectedItem() {
+        return selectedItem;
     }
 
     @Override
@@ -116,10 +122,22 @@ public class ItemsTableController extends FxmlController {
                 return;
             }
 
-            runLater(() -> items.setAll(channel.getItems()));
+            runLater(() -> {
+                items.setAll(channel.getItems());
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(100L);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    runLater(itemsTable.getSelectionModel()::selectFirst);
+                }).start();
+            });
         });
 
         itemsTable.setItems(items);
+
+        selectedItem.bind(itemsTable.getSelectionModel().selectedItemProperty());
     }
 
     private void setAlignment(String id, Pos pos) {

@@ -8,7 +8,8 @@ import java.io.*;
 public enum Fxml {
     CHANNELS_TREE("/com/github/idelstak/myrss/channels-tree.fxml"),
     ITEMS_TABLE("/com/github/idelstak/myrss/items-table.fxml"),
-    ITEMS_CONTENT("/com/github/idelstak/myrss/item-content.fxml");
+    ITEMS_CONTENT("/com/github/idelstak/myrss/item-content.fxml"),
+    MAIN_VIEW("/com/github/idelstak/myrss/main-view.fxml");
 
     private final String path;
     private Parent root;
