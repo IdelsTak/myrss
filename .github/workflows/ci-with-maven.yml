@@ -1,39 +1,161 @@
 name: Java CI with Maven
 
-# Trigger the workflow on push or pull request events for the master branch
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
+#jobs:
+#  build:
+#    # Use the latest Ubuntu environment for the build
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      # Step 1: Check out the code from the repository
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      # Step 2: Set up JDK 22 using Temurin distribution and enable Maven cache
+#      - name: Set up JDK 22
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '22'
+#          distribution: 'temurin'
+#          cache: maven
+#
+#      # Step 3: Run the tests on a Linux environment
+#      - name: Run Tests (Linux)
+#        run: |
+#          # Set up display for GUI tests
+#          # This part ensures that the GUI tests using TestFX will run correctly
+#          # in the CI environment.
+#          export DISPLAY=:90
+#          # Start a virtual frame buffer for GUI tests
+#          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+#          # Clean and install the Maven project, running all tests
+#          mvn clean install
+
+env:
+  JAVA_VERSION: '22'
+  JAVA_DISTRIBUTION: 'temurin'
+
 jobs:
-  build:
-    # Use the latest Ubuntu environment for the build
+  get-project-details:
     runs-on: ubuntu-latest
-
+    outputs:
+      artifact_id: ${{ steps.project_details.outputs.artifact_id }}
+      version: ${{ steps.project_details.outputs.version }}
     steps:
-      # Step 1: Check out the code from the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up JDK 22 using Temurin distribution and enable Maven cache
-      - name: Set up JDK 22
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: '22'
-          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
-
-      # Step 3: Run the tests on a Linux environment
-      - name: Run Tests (Linux)
+      - name: Get project details
+        id: project_details
         run: |
-          # Set up display for GUI tests
-          # This part ensures that the GUI tests using TestFX will run correctly
-          # in the CI environment.
+          echo "artifact_id=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_OUTPUT
+          echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+      - name: Debug output
+        run: |
+          echo "Artifact ID: ${{ steps.project_details.outputs.artifact_id }}"
+          echo "Version: ${{ steps.project_details.outputs.version }}"
+
+  test:
+    needs: get-project-details
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+      - name: Run tests
+        run: |
           export DISPLAY=:90
-          # Start a virtual frame buffer for GUI tests
           Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          # Clean and install the Maven project, running all tests
           mvn clean install
 
+  build:
+    needs: [get-project-details, test]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            profile: linux
+          - os: macos-latest
+            profile: macos
+          - os: windows-latest
+            profile: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      - name: Debug project details
+        run: |
+          echo "Artifact ID: ${{ needs.get-project-details.outputs.artifact_id }}"
+          echo "Version: ${{ needs.get-project-details.outputs.version }}"
+          echo "Profile: ${{ matrix.profile }}"
+
+      - name: Build JAR
+        run: mvn clean package -P${{ matrix.profile }}
+
+      - name: Debug artifact name
+        run: |
+          echo "Artifact name: ${{ needs.get-project-details.outputs.artifact_id }}-${{ needs.get-project-details.outputs.version }}-${{ matrix.profile }}"
+          ls target/*.jar
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ needs.get-project-details.outputs.artifact_id }}-${{ needs.get-project-details.outputs.version }}-${{ matrix.profile }}
+          path: target/*.jar
+
+  release:
+    needs: [ get-project-details, build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Check and Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.get-project-details.outputs.version }}
+          ARTIFACT_ID: ${{ needs.get-project-details.outputs.artifact_id }}
+        run: |
+          TAG="v$VERSION"
+          echo "Checking for existing release with tag: $TAG"
+
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Release $TAG already exists. Skipping release creation."
+          else
+            echo "Creating new release with tag: $TAG"
+            gh release create "$TAG" \
+              --title "Release $VERSION" \
+              --generate-notes
+
+            for OS in linux macos windows; do
+              ARTIFACT_NAME=$(ls artifacts/$ARTIFACT_ID-$VERSION-$OS/*.jar | xargs -n 1 basename)
+              echo "Uploading artifact: $ARTIFACT_NAME"
+              gh release upload "$TAG" "artifacts/$ARTIFACT_ID-$VERSION-$OS/$ARTIFACT_NAME"
+            done
+          fi
